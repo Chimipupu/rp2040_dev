@@ -18,6 +18,7 @@
 #include "pico/stdlib.h"
 #include "hardware/clocks.h"
 
+void app_main_core_0_init(void);
 void app_main_core_1_init(void);
 void app_main_core_0(void);
 void app_main_core_1(void);
