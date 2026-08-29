@@ -28,9 +28,9 @@ void app_main_core_0(void)
 {
     bool is_ret_rx_fifo;
     bool is_ret_tx_fifo;
-    bool is_tx_fifo_data = false;
     uint32_t data_type = 0;
     uint32_t local_fifo_data = 0;
+    static bool s_is_tx_fifo_data = false;
     static uint8_t s_rx_fifo_buf_idx = 0;
     static uint8_t s_tx_fifo_buf_idx = 0;
 
@@ -54,7 +54,7 @@ void app_main_core_0(void)
                 rgb_val.rgb = (local_fifo_data & CPU_FIFO_DATA_BIT);
                 app_neopixel_set_rgb(0, &rgb_val);
                 s_fifo_cpu_core_0.tx_fifo_buf[s_tx_fifo_buf_idx] = (CPU_FIFO_DATA_TYPE_RESULT << 24) | CPU_FIFO_DATA_RESULT_PROCESS_COMPLETE;
-                is_tx_fifo_data = true;
+                s_is_tx_fifo_data = true;
 #endif
                 break;
 
@@ -63,11 +63,11 @@ void app_main_core_0(void)
         }
     }
 
-    if(is_tx_fifo_data != false) {
+    if(s_is_tx_fifo_data != false) {
         is_ret_tx_fifo = cpu_fifo_tx_data(s_fifo_cpu_core_0.tx_fifo_buf[s_tx_fifo_buf_idx]);
 
         if(is_ret_tx_fifo != false) {
-            is_tx_fifo_data = false;
+            s_is_tx_fifo_data = false;
             Serial.printf("[DEBUG] CPU Core 0, TX FIFO[%d]: 0x%08X\n",
                             s_tx_fifo_buf_idx,
                             s_fifo_cpu_core_0.tx_fifo_buf[s_tx_fifo_buf_idx]
@@ -103,11 +103,11 @@ void app_main_core_1_init(void)
  */
 void app_main_core_1(void)
 {
-    bool is_ret_rx_fifo;
-    bool is_ret_tx_fifo;
-    bool is_tx_fifo_data = true;
+    bool is_ret_tx_fifo = false;
+    bool is_ret_rx_fifo = false;
     uint32_t data_type = 0;
     uint32_t local_fifo_data = 0;
+    static bool s_is_tx_fifo_data = true;
     static uint8_t s_rx_fifo_buf_idx = 0;
     static uint8_t s_tx_fifo_buf_idx = 0;
 
@@ -127,7 +127,7 @@ void app_main_core_1(void)
                 if((local_fifo_data & CPU_FIFO_DATA_BIT) == CPU_FIFO_DATA_RESULT_PROCESS_COMPLETE) {
                     // 次に送信するFIFOのデータに進める
                     s_tx_fifo_buf_idx = (s_tx_fifo_buf_idx + 1) % CPU_FIFO_BUF_SIZE;
-                    is_tx_fifo_data = true;
+                    s_is_tx_fifo_data = true;
                 }
                 break;
 
@@ -136,11 +136,11 @@ void app_main_core_1(void)
         }
     }
 
-    if(is_tx_fifo_data != false) {
+    if(s_is_tx_fifo_data != false) {
         is_ret_tx_fifo = cpu_fifo_tx_data(s_fifo_cpu_core_1.tx_fifo_buf[s_tx_fifo_buf_idx]);
 
         if(is_ret_tx_fifo != false) {
-            is_tx_fifo_data = false;
+            s_is_tx_fifo_data = false;
             Serial.printf("[DEBUG] CPU Core 1, TX FIFO[%d]: 0x%08X\n",
                             s_tx_fifo_buf_idx,
                             s_fifo_cpu_core_1.tx_fifo_buf[s_tx_fifo_buf_idx]
