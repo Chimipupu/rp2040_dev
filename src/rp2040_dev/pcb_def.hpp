@@ -1,12 +1,10 @@
 /**
  * @file pcb_def.hpp
  * @author Chimipupu(https://github.com/Chimipupu)
- * @brief 基板関連のヘッダー
+ * @brief 基板定義
  * @version 0.1
- * @date 2025-06-18
- * 
- * @copyright Copyright (c) 2025
- * 
+ * @date 2026-08-29
+ * @copyright Copyright (c) 2026 Chimipupu All Rights Reserved.
  */
 #ifndef PCB_DEF_HPP
 #define PCB_DEF_HPP
@@ -14,9 +12,19 @@
 #include <stdint.h>
 #include <string.h>
 
-#define PCB_MAKERPI_RP2040
 // #define PCB_RPI_PICO
 // #define PCB_RPI_PICO_W
+#define PCB_RP2040_ZERO
+// #define PCB_YD_RP2040
+// #define PCB_MAKERPI_RP2040
+
+// RP2040 Zero
+#ifdef PCB_RP2040_ZERO
+    #define RGBLED_PIN               16  // Neopixel (GPIO 16)
+    #define RGBLED_NUM               1   // RGBLEDの数
+    #define RGBLED_MAX_BRIGHTNESS    32  // RGBLEDの最大輝度
+    #define RGBLED_COLOR_ON_TIMER    100 // RGBLEDの1色の表示時間
+#endif // PCB_RP2040_ZERO
 
 // VCC-GND RP2040
 #ifdef PCB_YD_RP2040

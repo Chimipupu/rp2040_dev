@@ -1,12 +1,10 @@
 /**
  * @file makerpi_rp2040.ino
  * @author Chimipupu(https://github.com/Chimipupu)
- * @brief Arduino IDE用ファイル
+ * @brief RP2040 Arduinoメイン
  * @version 0.1
- * @date 2025-06-18
- * 
- * @copyright Copyright (c) 2025
- * 
+ * @date 2026-08-29
+ * @copyright Copyright (c) 2026 Chimipupu All Rights Reserved.
  */
 #include "app_main.hpp"
 #include "multi_core_cpu.hpp"

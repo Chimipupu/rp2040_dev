@@ -1,27 +1,24 @@
 /**
  * @file pcb_def.cpp
  * @author Chimipupu(https://github.com/Chimipupu)
- * @brief 基板関連のアプリ
+ * @brief 基板固有処理
  * @version 0.1
- * @date 2025-06-18
- * 
- * @copyright Copyright (c) 2025
- * 
+ * @date 2026-08-29
+ * @copyright Copyright (c) 2026 Chimipupu All Rights Reserved.
  */
 #include "pcb_def.hpp"
 #include <Arduino.h>
 
+// ---------------------------------------------------
+#ifdef PCB_MAKERPI_RP2040
 static void show_single_led(uint32_t idx);
 static void show_bit_led(uint32_t val);
-
-#ifdef PCB_MAKERPI_RP2040
 
 volatile bool g_btn0_flag = false;
 volatile bool g_btn1_flag = false;
 
 /**
  * @brief ボタン0の割り込みサービスルーチン
- * 
  */
 void btn0_ISR()
 {
@@ -30,7 +27,6 @@ void btn0_ISR()
 
 /**
  * @brief ボタン1の割り込みサービスルーチン
- * 
  */
 void btn1_ISR()
 {
@@ -64,7 +60,6 @@ static void show_bit_led(uint32_t val)
 
 /**
  * @brief LEDを左右に行ったりきたり光らせる
- * 
  * @param loop_cnt 点滅回数
  */
 void led_sequential_blink(uint32_t loop_cnt)
@@ -92,7 +87,6 @@ void led_sequential_blink(uint32_t loop_cnt)
 
 /**
  * @brief 13bitの値をLEDに表示しながら点滅
- * 
  * @param loop_cnt 点滅回数
  */
 void led_bit_blink(uint32_t loop_cnt)
@@ -108,9 +102,9 @@ void led_bit_blink(uint32_t loop_cnt)
 }
 #endif // PCB_MAKERPI_RP2040
 
+// ---------------------------------------------------
 /**
  * @brief GPIO初期化
- * 
  */
 void gpio_init(void)
 {
@@ -138,7 +132,6 @@ void gpio_init(void)
 
 /**
  * @brief UART初期化
- * 
  */
 void uart_init(void)
 {
@@ -148,7 +141,6 @@ void uart_init(void)
 
 /**
  * @brief ボタンのポーリング
- * 
  */
 void btn_polling(void)
 {
