@@ -30,6 +30,14 @@ typedef enum {
     CPU_FIFO_DATA_TYPE_DEBUG = 0xFF,
 } E_CPU_FIFO_DATA;
 
+typedef enum {
+    CPU_FIFO_DATA_RESULT_OK = 0,               // OK
+    CPU_FIFO_DATA_RESULT_PROCESSING,           // 処理中
+    CPU_FIFO_DATA_RESULT_PROCESS_COMPLETE,     // 処理完了
+    CPU_FIFO_DATA_RESULT_RESEND_DATA_REQ,      // 再送依頼
+    CPU_FIFO_DATA_RESULT_ERROR_CRC32,          // CRC32エラー
+    CPU_FIFO_DATA_RESULT_ERROR_UNKNOWN = 0xFF, // 不明なエラー
+} E_CPU_FIFO_DATA_RESULT;
 
 typedef struct {
     uint32_t tx_fifo_buf[CPU_FIFO_BUF_SIZE];

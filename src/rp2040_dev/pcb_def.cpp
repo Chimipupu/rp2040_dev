@@ -11,14 +11,57 @@
 
 // ---------------------------------------------------
 #ifdef PCB_MAKERPI_RP2040
+// 基板の青LEDのGPIO
+const uint8_t g_ob_blue_leds[OB_LED_BIT_NUM] = {
+    0, 1, 2, 3, 4, 5, 6, 7,
+    16, 17, 26, 27, 28
+};
+
 static void show_single_led(uint32_t idx);
 static void show_bit_led(uint32_t val);
+static void gpio_init_makerpi_rp2040(void);
+static void btn_polling_rp2040(void);
 
 volatile bool g_btn0_flag = false;
 volatile bool g_btn1_flag = false;
 
+static void gpio_init_makerpi_rp2040(void)
+{
+    uint8_t i;
+
+    // ボタン初期化
+    pinMode(OB_BTN_0, INPUT); // 基板ボタン0(GPIO20)
+    pinMode(OB_BTN_1, INPUT); // 基板ボタン1(GPIO21)
+    attachInterrupt(digitalPinToInterrupt(OB_BTN_0), // 割り込み
+                    btn0_ISR,                        // ISR
+                    FALLING);                        // Lowで割り込み
+    attachInterrupt(digitalPinToInterrupt(OB_BTN_1), // 割り込み
+                    btn1_ISR,                        // ISR
+                    FALLING);                        // Lowで割り込み
+
+    // 青LED初期化
+    for (i = 0; i < OB_LED_BIT_NUM; i++)
+    {
+        pinMode(g_ob_blue_leds[i], OUTPUT);
+        digitalWrite(g_ob_blue_leds[i], LOW);
+    }
+}
+
+static void btn_polling_rp2040(void)
+{
+    if (g_btn0_flag != false) {
+        g_btn0_flag = false;
+        led_sequential_blink(LED_LOOP_CNT);
+    }
+
+    if (g_btn1_flag != false){
+        g_btn1_flag = false;
+        led_bit_blink(LED_LOOP_CNT);
+    }
+}
+
 /**
- * @brief ボタン0の割り込みサービスルーチン
+ * @brief ボタン0の割り込みハンドラ
  */
 void btn0_ISR()
 {
@@ -26,15 +69,12 @@ void btn0_ISR()
 }
 
 /**
- * @brief ボタン1の割り込みサービスルーチン
+ * @brief ボタン1の割り込みハンドラ
  */
 void btn1_ISR()
 {
     g_btn1_flag = true;
 }
-
-// 基板の青LEDのGPIO
-const uint8_t g_ob_blue_leds[OB_LED_BIT_NUM] = {0, 1, 2, 3, 4, 5, 6, 7, 16, 17, 26, 27, 28};
 
 // 指定したLEDだけ点灯
 static void show_single_led(uint32_t idx)
@@ -109,24 +149,7 @@ void led_bit_blink(uint32_t loop_cnt)
 void gpio_init(void)
 {
 #ifdef PCB_MAKERPI_RP2040
-    uint8_t i;
-
-    // ボタン初期化
-    pinMode(OB_BTN_0, INPUT); // 基板ボタン0(GPIO20)
-    pinMode(OB_BTN_1, INPUT); // 基板ボタン1(GPIO21)
-    attachInterrupt(digitalPinToInterrupt(OB_BTN_0), // 割り込み
-                    btn0_ISR,                        // ISR
-                    FALLING);                        // Lowで割り込み
-    attachInterrupt(digitalPinToInterrupt(OB_BTN_1), // 割り込み
-                    btn1_ISR,                        // ISR
-                    FALLING);                        // Lowで割り込み
-
-                    // 青LED初期化
-    for (i = 0; i < OB_LED_BIT_NUM; i++)
-    {
-        pinMode(g_ob_blue_leds[i], OUTPUT);
-        digitalWrite(g_ob_blue_leds[i], LOW);
-    }
+    gpio_init_makerpi_rp2040();
 #endif // PCB_MAKERPI_RP2040
 }
 
@@ -145,14 +168,6 @@ void uart_init(void)
 void btn_polling(void)
 {
 #ifdef PCB_MAKERPI_RP2040
-    if (g_btn0_flag != false) {
-        g_btn0_flag = false;
-        led_sequential_blink(LED_LOOP_CNT);
-    }
-
-    if (g_btn1_flag != false){
-        g_btn1_flag = false;
-        led_bit_blink(LED_LOOP_CNT);
-    }
+    btn_polling_rp2040();
 #endif // PCB_MAKERPI_RP2040
 }
