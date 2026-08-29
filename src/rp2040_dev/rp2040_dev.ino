@@ -9,7 +9,8 @@
 #include "app_main.hpp"
 #include "multi_core_cpu.hpp"
 
-/********** CPU Core 0 ***********/
+// ---------------------------------------------------
+// ********** [CPU Core 0] ***********
 void setup()
 {
     cpu_core_0_init();
@@ -17,10 +18,11 @@ void setup()
 
 void loop()
 {
-    app_main_core_0();
+    cpu_core_0_main();
 }
 
-/********** CPU Core 1 ***********/
+// ---------------------------------------------------
+// ********** [CPU Core 1] ***********
 void setup1()
 {
     cpu_core_1_init();
@@ -28,5 +30,6 @@ void setup1()
 
 void loop1()
 {
-    app_main_core_1();
+    cpu_core_1_main();
 }
+// ---------------------------------------------------

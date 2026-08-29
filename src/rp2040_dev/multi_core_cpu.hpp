@@ -19,8 +19,17 @@
 #define CPU_FIFO_DATA_NONE           0
 
 #define CPU_FIFO_DATA_BIT            0x00FFFFFF
+
 #define CPU_FIFO_DATA_TYPE_BIT       0xFF000000
-#define CPU_FIFO_DATA_TYPE_RGBLED    0x01000000
+typedef enum {
+    CPU_FIFO_DATA_TYPE_CONFIG = 0,
+    CPU_FIFO_DATA_TYPE_REQUEST,
+    CPU_FIFO_DATA_TYPE_RESULT,
+    CPU_FIFO_DATA_TYPE_MSG_ASCII,
+    CPU_FIFO_DATA_TYPE_RGBLED,
+    CPU_FIFO_DATA_TYPE_DEBUG = 0xFF,
+} E_CPU_FIFO_DATA;
+
 
 typedef struct {
     uint32_t tx_fifo_buf[CPU_FIFO_BUF_SIZE];
@@ -28,9 +37,13 @@ typedef struct {
 } cpu_fifo_t;
 
 // ---------------------------------------------------
-bool multi_core_cpu_tx_data(uint32_t data);
-bool multi_core_cpu_rx_data(uint32_t *p_data);
+bool cpu_fifo_tx_data(uint32_t data);
+bool cpu_fifo_rx_data(uint32_t *p_data);
 void cpu_core_0_init(void);
 void cpu_core_1_init(void);
+void cpu_core_0_main(void);
+void cpu_core_1_main(void);
+
+// ---------------------------------------------------
 
 #endif // MULTI_CORE_CPU_HPP
