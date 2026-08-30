@@ -159,7 +159,6 @@ void gpio_init(void)
 void uart_init(void)
 {
     Serial.begin(115200); // UART初期化（115200bps 8N1）
-    delay(800);           // シリアル初期化待ちディレイ
 }
 
 /**

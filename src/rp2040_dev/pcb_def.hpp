@@ -85,6 +85,9 @@
 
 void gpio_init(void);
 void uart_init(void);
+
+#ifdef BUTTON_PIN
 void btn_polling(void);
+#endif
 
 #endif // PCB_DEF_HPP

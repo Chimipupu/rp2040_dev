@@ -184,6 +184,11 @@ void cpu_core_0_init(void)
 void cpu_core_0_main(void)
 {
     _cpu_fifo_proc_cpu_core_0(); // CPU FIFO処理
+
+#ifdef BUTTON_PIN
+    btn_polling();
+#endif
+
     app_main_core_0();           // CPU Core 0用アプリ
 }
 
@@ -212,7 +217,8 @@ void cpu_core_1_init(void)
  */
 void cpu_core_1_main(void)
 {
-    _cpu_fifo_proc_cpu_core_1(); // CPU FIFO処理
+    // _cpu_fifo_proc_cpu_core_1(); // CPU FIFO処理
+    // delay(500);
     app_main_core_1();           // CPU Core 1用アプリ
 }
 
