@@ -91,6 +91,7 @@ static bool _cmd_ready(uint8_t *p_cmd_buf)
             ) {
                 s_cmd_type = CMD_TYPE_BASIC;
                 ps_exec_cmd_func = s_basic_cmd_tbl[i].pfunc;
+                s_cmd_config.p_printf("Basic Cmd: %s\n", p_token);
                 break;
             }
         }
@@ -104,6 +105,7 @@ static bool _cmd_ready(uint8_t *p_cmd_buf)
                 ) {
                     s_cmd_type = CMD_TYPE_EXT;
                     ps_exec_cmd_func = p_tbl->pfunc;
+                    s_cmd_config.p_printf("Ext Cmd: %s\n", p_token);
                     break;
                 }
                 p_tbl++;
@@ -125,7 +127,6 @@ static bool _cmd_ready(uint8_t *p_cmd_buf)
     {
         case CMD_TYPE_BASIC:
         case CMD_TYPE_EXT:
-            s_cmd_config.p_printf("[DEBUG] Cmd: %s\r\n", p_token);
             s_rx_cmd_no = i;
             is_ret = true;
             break;
@@ -274,7 +275,7 @@ void dbg_cmd_main(void)
         {
             for (uint8_t i = 0; i < s_cmd_args.argc; i++)
             {
-                s_cmd_config.p_printf("[DEBUG] Arg[%d]: %s\r\n", i, s_cmd_args.argv[i]);
+                s_cmd_config.p_printf("Arg[%d]: %s\n", i, s_cmd_args.argv[i]);
             }
             ps_exec_cmd_func((void *)&s_cmd_args);
         }
