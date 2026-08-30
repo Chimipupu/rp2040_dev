@@ -23,9 +23,33 @@
 
 // ---------------------------------------------------
 static unsigned int DBG_LOG_PRINT(const char *p_fmt, ...);
+
+#ifdef RGBLED_PIN
+typedef struct {
+    char color_num;
+    led_color_t *p_color;
+    const char *p_color_str;
+} rgbled_args_t;
+
+const rgbled_args_t g_rgbled_color_args_tbl[] = {
+    { '0', (led_color_t *) &g_led_color_tbl[0].rgb, g_led_color_tbl[0].p_color_str },
+    { '1', (led_color_t *) &g_led_color_tbl[1].rgb, g_led_color_tbl[1].p_color_str },
+    { '2', (led_color_t *) &g_led_color_tbl[2].rgb, g_led_color_tbl[2].p_color_str },
+    { '3', (led_color_t *) &g_led_color_tbl[3].rgb, g_led_color_tbl[3].p_color_str },
+    { '4', (led_color_t *) &g_led_color_tbl[4].rgb, g_led_color_tbl[4].p_color_str },
+    { '5', (led_color_t *) &g_led_color_tbl[5].rgb, g_led_color_tbl[5].p_color_str },
+    { '6', (led_color_t *) &g_led_color_tbl[6].rgb, g_led_color_tbl[6].p_color_str },
+    { '7', (led_color_t *) &g_led_color_tbl[7].rgb, g_led_color_tbl[7].p_color_str },
+};
+const uint8_t RGBLED_COLOR_ARGS_TBL_CNT = sizeof(g_rgbled_color_args_tbl) / sizeof(g_rgbled_color_args_tbl[0]);
+
 static E_DBG_CMD_RESULT _cmd_rgbled(void *p_args);
+#endif
+
 static const dbg_cmd_tbl_t s_ext_cmd_tbl[] = {
+#ifdef RGBLED_PIN
     {"rgbled", "rl", _cmd_rgbled},
+#endif
 };
 static uint8_t _serial_read_func(void);
 
@@ -56,31 +80,46 @@ static uint8_t _serial_read_func(void)
     return (uint8_t)Serial.read();
 }
 
+#ifdef RGBLED_PIN
 static E_DBG_CMD_RESULT _cmd_rgbled(void *p_args)
 {
     uint8_t i;
+    char color_num;
     dbg_cmd_args_t *p_cmd_args;
 
+    DBG_LOG_PRINT("-------------------------------\n");
     DBG_LOG_PRINT("RGBLED Cmd\n");
+
     p_cmd_args = (dbg_cmd_args_t *)p_args;
 
     // 引数チェック
-    if(strcmp(p_cmd_args->argv[0], "color") == 0)
+    if(strcmp(p_cmd_args->argv[0], "help") == 0)
     {
-        for(i = 0; i < RGBLED_COLOR_TBL_SIZE; i++)
+        for(i = 0; i < RGBLED_COLOR_ARGS_TBL_CNT; i++)
         {
-            if(strcmp( p_cmd_args->argv[1], g_led_color_tbl[i].p_color_str) == 0)
+            DBG_LOG_PRINT("rgbled color %c -> %s\n",
+                        g_rgbled_color_args_tbl[i].color_num,
+                        g_rgbled_color_args_tbl[i].p_color_str);
+        }
+    }
+    else if(strcmp(p_cmd_args->argv[0], "color") == 0)
+    {
+        color_num = *(p_cmd_args->argv[1]);
+        for(i = 0; i < RGBLED_COLOR_ARGS_TBL_CNT; i++)
+        {
+            if(color_num == g_rgbled_color_args_tbl[i].color_num)
             {
-                app_neopixel_set_rgb(0, (led_color_t *) &g_led_color_tbl[i].rgb);
-                DBG_LOG_PRINT("Set RGBLED Color: %s\n", p_cmd_args->argv[1]);
+                app_neopixel_set_rgb(0, (led_color_t *) g_rgbled_color_args_tbl[i].p_color);
+                DBG_LOG_PRINT("Set RGBLED Color: %s\n", g_rgbled_color_args_tbl[i].p_color_str);
                 break;
             }
         }
     }
 
+    DBG_LOG_PRINT("-------------------------------\n");
     return CMD_RESULT_EXEC_OK;
 }
-
+#endif
 // ---------------------------------------------------
 // ********** [CPU Core 0] ***********
 /**

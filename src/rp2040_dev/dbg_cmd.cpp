@@ -83,6 +83,8 @@ static bool _cmd_ready(uint8_t *p_cmd_buf)
 
     if (p_token != NULL)
     {
+        s_cmd_config.p_printf("[DEBUG] Cmd: %s\r\n", p_token);
+
         // 最初のトークンをコマンド文字列で判定処理
         for(i = 0; i < BASIC_CMD_NUM; i++)
         {
@@ -125,7 +127,6 @@ static bool _cmd_ready(uint8_t *p_cmd_buf)
     {
         case CMD_TYPE_BASIC:
         case CMD_TYPE_EXT:
-            s_cmd_config.p_printf(ASCII_TXT_GREEN "Cmd Exec\r\n" ASCII_RESET);
             s_rx_cmd_no = i;
             is_ret = true;
             break;
@@ -274,7 +275,7 @@ void dbg_cmd_main(void)
         {
             for (uint8_t i = 0; i < s_cmd_args.argc; i++)
             {
-                s_cmd_config.p_printf("Arg[%d]: %s\r\n", i, s_cmd_args.argv[i]);
+                s_cmd_config.p_printf("[DEBUG] Arg[%d]: %s\r\n", i, s_cmd_args.argv[i]);
             }
             ps_exec_cmd_func((void *)&s_cmd_args);
         }
