@@ -30,6 +30,8 @@ static uint8_t s_rx_cmd_no;
 static dbg_cmd_config_t s_cmd_config;
 p_cmd_func ps_exec_cmd_func = NULL;
 
+static dbg_cmd_args_t s_cmd_args;
+
 static E_DBG_CMD_RESULT _cmd_help(void *p_args);
 static E_DBG_CMD_RESULT _cmd_clear(void *p_args);
 static const dbg_cmd_tbl_t s_basic_cmd_tbl[] = {
@@ -45,11 +47,10 @@ static bool _cmd_ready(uint8_t *p_cmd_buf)
 {
     bool is_ret;
     uint8_t i;
-    uint8_t *p_ptr;
+    char *p_token;
     dbg_cmd_tbl_t *p_tbl;
 
     is_ret = false;
-    p_ptr = p_cmd_buf;
     p_tbl = ps_cmd_tbl;
 
     if(s_cmd_config.p_printf == NULL)
@@ -63,41 +64,60 @@ static bool _cmd_ready(uint8_t *p_cmd_buf)
         return false;
     }
 
+    // CRLFを受信までをコピー、ヌル文字の終端をいれる
     for(i = 0; i < s_rx_buf_idx; i++)
     {
         if((s_rx_buf[i] == '\r') || (s_rx_buf[i] == '\n')) {
+            p_cmd_buf[i] = '\0';
             break;
         }
-
-        *p_ptr = s_rx_buf[i];
-        p_ptr++;
+        p_cmd_buf[i] = s_rx_buf[i];
     }
+    p_cmd_buf[i] = '\0';
 
     s_cmd_type = CMD_TYPE_NONE;
+    s_cmd_args.argc = 0;
 
-    for(i = 0; i < BASIC_CMD_NUM; i++)
-    {
-        if((strcmp(s_basic_cmd_tbl[i].p_cmd_str, (const char *) p_cmd_buf) == 0) || \
-            (strcmp(s_basic_cmd_tbl[i].p_cmd_str_short, (const char *) p_cmd_buf) == 0)
-        ) {
-            s_cmd_type = CMD_TYPE_BASIC;
-            ps_exec_cmd_func = s_basic_cmd_tbl[i].pfunc;
-            break;
-        }
-    }
+    // スペース区切りで文字列分割
+    p_token = strtok((char *)p_cmd_buf, " ");
 
-    if(s_cmd_type == CMD_TYPE_NONE)
+    if (p_token != NULL)
     {
-        for(i = 0; i < s_cmd_num; i++)
+        // 最初のトークンをコマンド文字列で判定処理
+        for(i = 0; i < BASIC_CMD_NUM; i++)
         {
-            if((strcmp(p_tbl->p_cmd_str, (const char *) p_cmd_buf) == 0) || \
-            (strcmp(p_tbl->p_cmd_str_short, (const char *) p_cmd_buf) == 0)
+            if((strcmp(s_basic_cmd_tbl[i].p_cmd_str, p_token) == 0) || \
+                (strcmp(s_basic_cmd_tbl[i].p_cmd_str_short, p_token) == 0)
             ) {
-                s_cmd_type = CMD_TYPE_EXT;
-                ps_exec_cmd_func = p_tbl->pfunc;
+                s_cmd_type = CMD_TYPE_BASIC;
+                ps_exec_cmd_func = s_basic_cmd_tbl[i].pfunc;
                 break;
             }
-            p_tbl++;
+        }
+
+        if(s_cmd_type == CMD_TYPE_NONE)
+        {
+            for(i = 0; i < s_cmd_num; i++)
+            {
+                if((strcmp(p_tbl->p_cmd_str, p_token) == 0) || \
+                (strcmp(p_tbl->p_cmd_str_short, p_token) == 0)
+                ) {
+                    s_cmd_type = CMD_TYPE_EXT;
+                    ps_exec_cmd_func = p_tbl->pfunc;
+                    break;
+                }
+                p_tbl++;
+            }
+        }
+
+        // 残りのトークンを引数として取得
+        while ((p_token = strtok(NULL, " ")) != NULL)
+        {
+            if (s_cmd_args.argc < DBG_CMD_MAX_ARGS)
+            {
+                s_cmd_args.argv[s_cmd_args.argc] = p_token;
+                s_cmd_args.argc++;
+            }
         }
     }
 
@@ -105,7 +125,7 @@ static bool _cmd_ready(uint8_t *p_cmd_buf)
     {
         case CMD_TYPE_BASIC:
         case CMD_TYPE_EXT:
-            s_cmd_config.p_printf(ASCII_TXT_GREEN "Cmd: %s\r\n" ASCII_RESET, p_cmd_buf);
+            s_cmd_config.p_printf(ASCII_TXT_GREEN "Cmd Exec\r\n" ASCII_RESET);
             s_rx_cmd_no = i;
             is_ret = true;
             break;
@@ -118,7 +138,6 @@ static bool _cmd_ready(uint8_t *p_cmd_buf)
     }
 
     memset((void *)&s_rx_buf[0], 0x00, UART_RX_BUF_SIZE);
-    memset((void *)&s_rx_cmd_buf[0], 0x00, UART_CMD_RX_BUF_SIZE);
     s_rx_buf_idx = 0;
     s_is_rx_uart_cmd_flg = false;
 
@@ -253,7 +272,13 @@ void dbg_cmd_main(void)
 
         if(is_ret != false)
         {
-            ps_exec_cmd_func(NULL);
+            for (uint8_t i = 0; i < s_cmd_args.argc; i++)
+            {
+                s_cmd_config.p_printf("Arg[%d]: %s\r\n", i, s_cmd_args.argv[i]);
+            }
+            ps_exec_cmd_func((void *)&s_cmd_args);
         }
+
+        memset((void *)&s_rx_cmd_buf[0], 0x00, UART_CMD_RX_BUF_SIZE);
     }
 }

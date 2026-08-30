@@ -56,6 +56,13 @@
 #define ASCII_RESET         "\33[0m"  // すべての設定をクリア
 #define ANSI_ESC_CLEAR      "\33[2J\33[H" // 画面消去
 // --------------------------------------------------------------------------
+#define DBG_CMD_MAX_ARGS    4
+
+typedef struct {
+    uint8_t argc;
+    char *argv[DBG_CMD_MAX_ARGS];
+} dbg_cmd_args_t;
+
 typedef enum {
     CMD_TYPE_BASIC = 0x00, // 基本コマンド
     CMD_TYPE_EXT,          // 拡張コマンド

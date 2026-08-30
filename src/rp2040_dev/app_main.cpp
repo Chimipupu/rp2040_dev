@@ -58,7 +58,26 @@ static uint8_t _serial_read_func(void)
 
 static E_DBG_CMD_RESULT _cmd_rgbled(void *p_args)
 {
-    DBG_LOG_PRINT("rgbled cmd\n");
+    uint8_t i;
+    dbg_cmd_args_t *p_cmd_args;
+
+    DBG_LOG_PRINT("RGBLED Cmd\n");
+    p_cmd_args = (dbg_cmd_args_t *)p_args;
+
+    // 引数チェック
+    if(strcmp(p_cmd_args->argv[0], "color") == 0)
+    {
+        for(i = 0; i < RGBLED_COLOR_TBL_SIZE; i++)
+        {
+            if(strcmp( p_cmd_args->argv[1], g_led_color_tbl[i].p_color_str) == 0)
+            {
+                app_neopixel_set_rgb(0, (led_color_t *) &g_led_color_tbl[i].rgb);
+                DBG_LOG_PRINT("Set RGBLED Color: %s\n", p_cmd_args->argv[1]);
+                break;
+            }
+        }
+    }
+
     return CMD_RESULT_EXEC_OK;
 }
 
