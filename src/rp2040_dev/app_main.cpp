@@ -46,9 +46,14 @@ const uint8_t RGBLED_COLOR_ARGS_TBL_CNT = sizeof(g_rgbled_color_args_tbl) / size
 static E_DBG_CMD_RESULT _cmd_rgbled(void *p_args);
 #endif
 
+static E_DBG_CMD_RESULT _cmd_debug(void *p_args);
+static E_DBG_CMD_RESULT _cmd_cpu_fifo(void *p_args);
+
 static const dbg_cmd_tbl_t s_ext_cmd_tbl[] = {
+    {"debug",   "dbg", _cmd_debug},
+    {"cpufifo", "cff", _cmd_cpu_fifo},
 #ifdef RGBLED_PIN
-    {"rgbled", "rl", _cmd_rgbled},
+    {"rgbled",  "rl",  _cmd_rgbled},
 #endif
 };
 static uint8_t _serial_read_func(void);
@@ -78,6 +83,47 @@ static unsigned int DBG_LOG_PRINT(const char *p_fmt, ...)
 static uint8_t _serial_read_func(void)
 {
     return (uint8_t)Serial.read();
+}
+
+static E_DBG_CMD_RESULT _cmd_debug(void *p_args)
+{
+    DBG_LOG_PRINT("-------------------------------\n");
+    DBG_LOG_PRINT("Debug Cmd\n");
+#if 0
+
+    dbg_cmd_args_t *p_cmd_args;
+    p_cmd_args = (dbg_cmd_args_t *)p_args;
+
+    // 引数チェック
+    if(strcmp(p_cmd_args->argv[0], "help") == 0)
+    {
+        // TODO
+    }
+
+#endif
+    DBG_LOG_PRINT("-------------------------------\n");
+
+    return CMD_RESULT_EXEC_OK;
+}
+
+static E_DBG_CMD_RESULT _cmd_cpu_fifo(void *p_args)
+{
+    dbg_cmd_args_t *p_cmd_args;
+
+    DBG_LOG_PRINT("-------------------------------\n");
+    DBG_LOG_PRINT("CPU FIFO Debug Cmd\n");
+
+    p_cmd_args = (dbg_cmd_args_t *)p_args;
+
+    // 引数チェック
+    if(strcmp(p_cmd_args->argv[0], "dump") == 0)
+    {
+        DBG_LOG_PRINT("CPU FIFO Buf Dump\n");
+        dump_cpu_fifo_buf();
+    }
+
+    DBG_LOG_PRINT("-------------------------------\n");
+    return CMD_RESULT_EXEC_OK;
 }
 
 #ifdef RGBLED_PIN

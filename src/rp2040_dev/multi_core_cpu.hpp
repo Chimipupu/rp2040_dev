@@ -47,6 +47,8 @@ typedef struct {
 // ---------------------------------------------------
 bool cpu_fifo_tx_data(uint32_t data);
 bool cpu_fifo_rx_data(uint32_t *p_data);
+void dump_cpu_fifo_buf(void);
+// void get_cpu_fifo_buf_ptr(uint8_t cpu_core, cpu_fifo_t *p_cpu_fifo);
 void cpu_core_0_init(void);
 void cpu_core_1_init(void);
 void cpu_core_0_main(void);

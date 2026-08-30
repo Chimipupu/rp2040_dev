@@ -127,7 +127,54 @@ static void _cpu_fifo_proc_cpu_core_1(void)
     }
 }
 
+#if 0
+void get_cpu_fifo_buf_ptr(uint8_t cpu_core, cpu_fifo_t *p_cpu_fifo)
+{
+    if(cpu_core == 0) {
+        p_cpu_fifo = &s_fifo_cpu_core_0;
+    } else {
+        p_cpu_fifo = &s_fifo_cpu_core_1;
+    }
+}
+#endif
 
+void dump_cpu_fifo_buf(void)
+{
+    uint8_t i;
+    uint32_t fifo_val;
+
+# if 1
+    // CPU Core 0
+    for(i = 0; i < CPU_FIFO_BUF_SIZE; i++)
+    {
+        fifo_val = s_fifo_cpu_core_0.rx_fifo_buf[i];
+        Serial.printf("[CPU Core 0] CPU RX FIFO Buf[%d]: 0x%08X\n", i, fifo_val);
+    }
+    Serial.printf("\n");
+    for(i = 0; i < CPU_FIFO_BUF_SIZE; i++)
+    {
+        fifo_val = s_fifo_cpu_core_0.tx_fifo_buf[i];
+        Serial.printf("[CPU Core 0] CPU TX FIFO Buf[%d]: 0x%08X\n", i, fifo_val);
+    }
+#endif
+
+    Serial.printf("\n");
+
+#if 1
+    // CPU Core 1
+    for(i = 0; i < CPU_FIFO_BUF_SIZE; i++)
+    {
+        fifo_val = s_fifo_cpu_core_1.rx_fifo_buf[i];
+        Serial.printf("[CPU Core 1] CPU RX FIFO Buf[%d]: 0x%08X\n", i, fifo_val);
+    }
+    Serial.printf("\n");
+    for(i = 0; i < CPU_FIFO_BUF_SIZE; i++)
+    {
+        fifo_val = s_fifo_cpu_core_1.tx_fifo_buf[i];
+        Serial.printf("[CPU Core 1] CPU TX FIFO Buf[%d]: 0x%08X\n", i, fifo_val);
+    }
+#endif
+}
 // ---------------------------------------------------
 // [API]
 
@@ -166,6 +213,9 @@ bool cpu_fifo_rx_data(uint32_t *p_data)
  */
 void cpu_core_0_init(void)
 {
+    memset(&s_fifo_cpu_core_0.rx_fifo_buf[0], 0x00, sizeof(CPU_FIFO_BUF_SIZE));
+    memset(&s_fifo_cpu_core_0.tx_fifo_buf[0], 0x00, sizeof(CPU_FIFO_BUF_SIZE));
+
     gpio_init(); // GPIO初期化
 
 #ifdef RGBLED_PIN
@@ -183,7 +233,7 @@ void cpu_core_0_init(void)
  */
 void cpu_core_0_main(void)
 {
-    _cpu_fifo_proc_cpu_core_0(); // CPU FIFO処理
+    // _cpu_fifo_proc_cpu_core_0(); // CPU FIFO処理
 
 #ifdef BUTTON_PIN
     btn_polling();
@@ -199,14 +249,18 @@ void cpu_core_0_main(void)
  */
 void cpu_core_1_init(void)
 {
+    memset(&s_fifo_cpu_core_1.rx_fifo_buf[0], 0x00, sizeof(CPU_FIFO_BUF_SIZE));
+    memset(&s_fifo_cpu_core_1.tx_fifo_buf[0], 0x00, sizeof(CPU_FIFO_BUF_SIZE));
+
     // RGBLED 初期化
 #ifdef RGBLED_PIN
-    uint8_t i;
     app_neopixel_init(RGBLED_PIN, RGBLED_NUM, RGBLED_MAX_BRIGHTNESS);
-    for(i = 0; i < CPU_FIFO_BUF_SIZE; i++)
+#if 0
+    for(uint8_t i = 0; i < CPU_FIFO_BUF_SIZE; i++)
     {
         s_fifo_cpu_core_1.tx_fifo_buf[i] = (g_led_color_tbl[i].rgb.rgb | (CPU_FIFO_DATA_TYPE_RGBLED << 24));
     }
+#endif
 #endif
 
     app_main_core_1_init(); // アプリ初期化
