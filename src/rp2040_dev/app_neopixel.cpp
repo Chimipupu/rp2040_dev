@@ -12,14 +12,14 @@
 // -----------------------------------------------------------
 // RGBLEDカラーテーブル
 const led_color_data_t g_led_color_tbl[] = {
-    { { .para = { .red = 0xFF, .green = 0x00, .blue = 0x00 } }, "RED" },    // 赤
-    { { .para = { .red = 0xFF, .green = 0xFF, .blue = 0x00 } }, "YELLOW" }, // 黄
-    { { .para = { .red = 0xFF, .green = 0xA5, .blue = 0x00 } }, "ORANGE" }, // 橙
-    { { .para = { .red = 0x00, .green = 0xFF, .blue = 0x00 } }, "GREEN" },  // 緑
-    { { .para = { .red = 0x00, .green = 0x00, .blue = 0xFF } }, "BLUE" },   // 青
-    { { .para = { .red = 0xFF, .green = 0x00, .blue = 0xFF } }, "PURPLE" }, // 紫
-    { { .para = { .red = 0xFF, .green = 0xFF, .blue = 0xFF } }, "WHITE" },  // 白
-    { { .para = { .red = 0x00, .green = 0x00, .blue = 0x00 } }, "OFF" }     // 消灯
+    { { .rgb = 0xFF0000   }, "RED" },    // 赤   0xFF0000
+    { { .rgb = 0xFFFF00   }, "YELLOW" }, // 黄   0xFFFF00
+    { { .rgb = 0xFFA500   }, "ORANGE" }, // 橙   0xFFA500
+    { { .rgb = 0x00FF00   }, "GREEN" },  // 緑   0x00FF00
+    { { .rgb = 0x0000FF   }, "BLUE" },   // 青   0x0000FF
+    { { .rgb = 0xFF00FF   }, "PURPLE" }, // 紫   0xFF00FF
+    { { .rgb = 0xFFFFFF   }, "WHITE" },  // 白   0xFFFFFF
+    { { .rgb = 0x00000000 }, "OFF" }     // 消灯 0x00000000
 };
 const uint8_t RGBLED_COLOR_TBL_SIZE = sizeof(g_led_color_tbl) / sizeof(g_led_color_tbl[0]);
 

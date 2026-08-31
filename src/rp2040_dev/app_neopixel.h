@@ -20,9 +20,9 @@
 typedef union {
     uint32_t rgb;
     struct {
-        uint32_t red : 8;
-        uint32_t green : 8;
         uint32_t blue : 8;
+        uint32_t green : 8;
+        uint32_t red : 8;
         uint32_t reserved : 8;
     } para;
 } led_color_t;
