@@ -104,8 +104,7 @@ static void _cpu_fifo_proc_cpu_core_1(void)
         {
             case CPU_FIFO_DATA_TYPE_RESULT:
                 if((local_fifo_data & CPU_FIFO_DATA_BIT) == CPU_FIFO_DATA_RESULT_PROCESS_COMPLETE) {
-                    // 次の送信データにidxを進める
-                    s_cpu_core_1_tx_fifo_buf_idx = (s_cpu_core_1_tx_fifo_buf_idx + 1) % CPU_FIFO_BUF_SIZE;
+                    // TODO
                 }
                 break;
 
@@ -123,6 +122,7 @@ static void _cpu_fifo_proc_cpu_core_1(void)
                             s_cpu_core_1_tx_fifo_buf_idx,
                             s_fifo_cpu_core_1.tx_fifo_buf[s_cpu_core_1_tx_fifo_buf_idx]
                         );
+            s_cpu_core_1_tx_fifo_buf_idx = (s_cpu_core_1_tx_fifo_buf_idx + 1) % CPU_FIFO_BUF_SIZE;
         }
     }
 }
@@ -135,11 +135,12 @@ void set_cpu_core_1_tx_fifo_data_flg(void)
 void set_cpu_core_1_tx_fifo_data(uint32_t data)
 {
     uint8_t idx;
-    static uint32_t write_cnt = 0;
+    static uint32_t s_write_cnt = 0;
 
-    idx = write_cnt % CPU_FIFO_BUF_SIZE;
+    idx = s_write_cnt % CPU_FIFO_BUF_SIZE;
     s_fifo_cpu_core_1.tx_fifo_buf[idx] = data;
     s_is_cpu_core_1_tx_fifo_data = true;
+    s_write_cnt++;
 }
 
 #if 0
