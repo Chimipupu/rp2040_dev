@@ -121,6 +121,10 @@ static E_DBG_CMD_RESULT _cmd_cpu_fifo(void *p_args)
         DBG_LOG_PRINT("CPU FIFO Buf Dump\n");
         dump_cpu_fifo_buf();
     }
+    else if (strcmp(p_cmd_args->argv[0], "dbg") == 0)
+    {
+        set_cpu_core_1_tx_fifo_data_flg();
+    }
 
     DBG_LOG_PRINT("-------------------------------\n");
     return CMD_RESULT_EXEC_OK;
@@ -201,7 +205,6 @@ void app_main_core_1(void)
 {
     dbg_cmd_poll();
     dbg_cmd_main();
-    delay(10);
 }
 
 // ---------------------------------------------------

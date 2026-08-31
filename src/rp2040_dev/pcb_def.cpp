@@ -161,6 +161,7 @@ void uart_init(void)
     Serial.begin(115200); // UART初期化（115200bps 8N1）
 }
 
+#ifdef BUTTON_PIN
 /**
  * @brief ボタンのポーリング
  */
@@ -170,3 +171,4 @@ void btn_polling(void)
     btn_polling_rp2040();
 #endif // PCB_MAKERPI_RP2040
 }
+#endif
