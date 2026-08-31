@@ -108,6 +108,7 @@ static E_DBG_CMD_RESULT _cmd_debug(void *p_args)
 
 static E_DBG_CMD_RESULT _cmd_cpu_fifo(void *p_args)
 {
+    uint32_t tmp_u32;
     dbg_cmd_args_t *p_cmd_args;
 
     DBG_LOG_PRINT("-------------------------------\n");
@@ -124,6 +125,12 @@ static E_DBG_CMD_RESULT _cmd_cpu_fifo(void *p_args)
     else if (strcmp(p_cmd_args->argv[0], "dbg") == 0)
     {
         set_cpu_core_1_tx_fifo_data_flg();
+    }
+    else if (strcmp(p_cmd_args->argv[0], "set") == 0)
+    {
+        tmp_u32 = (uint32_t)strtoul(p_cmd_args->argv[1], NULL, 16);
+        Serial.printf("Set, CPU Core 1 Tx FIFO Data: 0x%08X\n", tmp_u32);
+        set_cpu_core_1_tx_fifo_data(tmp_u32);
     }
 
     DBG_LOG_PRINT("-------------------------------\n");

@@ -18,6 +18,7 @@
 #endif
 
 // ---------------------------------------------------
+static uint8_t s_cpu_core_1_tx_fifo_buf_idx = 0;
 static bool s_is_cpu_core_1_tx_fifo_data = false;
 
 static cpu_fifo_t s_fifo_cpu_core_0;
@@ -87,7 +88,6 @@ static void _cpu_fifo_proc_cpu_core_1(void)
     uint32_t data_type = 0;
     uint32_t local_fifo_data = 0;
     static uint8_t s_rx_fifo_buf_idx = 0;
-    static uint8_t s_tx_fifo_buf_idx = 0;
 
     is_ret_rx_fifo = cpu_fifo_rx_data(&s_fifo_cpu_core_1.rx_fifo_buf[s_rx_fifo_buf_idx]);
 
@@ -105,7 +105,7 @@ static void _cpu_fifo_proc_cpu_core_1(void)
             case CPU_FIFO_DATA_TYPE_RESULT:
                 if((local_fifo_data & CPU_FIFO_DATA_BIT) == CPU_FIFO_DATA_RESULT_PROCESS_COMPLETE) {
                     // 次の送信データにidxを進める
-                    s_tx_fifo_buf_idx = (s_tx_fifo_buf_idx + 1) % CPU_FIFO_BUF_SIZE;
+                    s_cpu_core_1_tx_fifo_buf_idx = (s_cpu_core_1_tx_fifo_buf_idx + 1) % CPU_FIFO_BUF_SIZE;
                 }
                 break;
 
@@ -115,13 +115,13 @@ static void _cpu_fifo_proc_cpu_core_1(void)
     }
 
     if(s_is_cpu_core_1_tx_fifo_data != false) {
-        is_ret_tx_fifo = cpu_fifo_tx_data(s_fifo_cpu_core_1.tx_fifo_buf[s_tx_fifo_buf_idx]);
+        is_ret_tx_fifo = cpu_fifo_tx_data(s_fifo_cpu_core_1.tx_fifo_buf[s_cpu_core_1_tx_fifo_buf_idx]);
 
         if(is_ret_tx_fifo != false) {
             s_is_cpu_core_1_tx_fifo_data = false;
             Serial.printf("[DEBUG] CPU Core 1, TX FIFO[%d]: 0x%08X\n",
-                            s_tx_fifo_buf_idx,
-                            s_fifo_cpu_core_1.tx_fifo_buf[s_tx_fifo_buf_idx]
+                            s_cpu_core_1_tx_fifo_buf_idx,
+                            s_fifo_cpu_core_1.tx_fifo_buf[s_cpu_core_1_tx_fifo_buf_idx]
                         );
         }
     }
@@ -129,6 +129,16 @@ static void _cpu_fifo_proc_cpu_core_1(void)
 
 void set_cpu_core_1_tx_fifo_data_flg(void)
 {
+    s_is_cpu_core_1_tx_fifo_data = true;
+}
+
+void set_cpu_core_1_tx_fifo_data(uint32_t data)
+{
+    uint8_t idx;
+    static uint32_t write_cnt = 0;
+
+    idx = write_cnt % CPU_FIFO_BUF_SIZE;
+    s_fifo_cpu_core_1.tx_fifo_buf[idx] = data;
     s_is_cpu_core_1_tx_fifo_data = true;
 }
 
